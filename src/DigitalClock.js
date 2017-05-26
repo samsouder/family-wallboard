@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import Moment from 'moment';
-import './Datetime.css';
+import './DigitalClock.css';
 
-class Datetime extends Component {
+class DigitalClock extends Component {
   timerId: number;
   state: { date: Date } = { date: new Date() };
 
@@ -23,7 +23,7 @@ class Datetime extends Component {
     const date = this.state.date;
 
     return (
-      <div className="Datetime">
+      <div className="DigitalClock">
         <div className="time">
           <span className="hours">{Moment(date).format('h')}</span>
           <span className="minutes">{Moment(date).format('mm')}</span>
@@ -40,4 +40,4 @@ class Datetime extends Component {
   }
 }
 
-export default Datetime;
+export default DigitalClock;

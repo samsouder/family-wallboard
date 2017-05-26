@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import SimplePhoto from './SimplePhoto';
-import Datetime from './Datetime';
+import DigitalClock from './DigitalClock';
 import DarkSkyWeather from './DarkSkyWeather';
 import './App.css';
 
@@ -15,8 +15,6 @@ class App extends Component {
     return (
       <div>
         <SimplePhoto photos={this.photos}/>
-        <Datetime />
-        <DarkSkyWeather />
       </div>
     );
   }

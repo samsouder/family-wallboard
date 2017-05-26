@@ -1,0 +1,23 @@
+.DigitalClock {}
+
+.DigitalClock .time {}
+
+.DigitalClock .hours {}
+
+.DigitalClock .hours::after {
+  content: ':';
+}
+
+.DigitalClock .minutes {}
+
+.DigitalClock .seconds {}
+
+.DigitalClock .ampm {}
+
+.DigitalClock .date {}
+
+.DigitalClock .dayOfWeek {}
+
+.DigitalClock .month {}
+
+.DigitalClock .dayOfMonth {}
