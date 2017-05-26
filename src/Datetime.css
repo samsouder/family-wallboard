@@ -1,0 +1,23 @@
+.Datetime {}
+
+.Datetime .time {}
+
+.Datetime .hours {}
+
+.Datetime .hours::after {
+  content: ':';
+}
+
+.Datetime .minutes {}
+
+.Datetime .seconds {}
+
+.Datetime .ampm {}
+
+.Datetime .date {}
+
+.Datetime .dayOfWeek {}
+
+.Datetime .month {}
+
+.Datetime .dayOfMonth {}
