@@ -1,1 +1,22 @@
-.Photo {}
+.Photo, .PhotoBackground {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  background-color: transparent;
+  background-position: center center;
+  background-repeat: no-repeat no-repeat;
+}
+
+.Photo {
+  background-size: contain;
+  z-index: 100;
+}
+
+.PhotoBackground {
+  background-size: cover;
+  filter: blur(50px) grayscale(50%);
+  z-index: 90;
+}
