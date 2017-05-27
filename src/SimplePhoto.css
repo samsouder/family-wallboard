@@ -26,13 +26,14 @@
 .Photo {
   background-size: contain;
   filter: drop-shadow(0 0 5em black);
-  z-index: 1;
+  z-index: -1;
 }
 
 .PhotoBackground {
   background-color: black;
   background-size: cover;
   filter: saturate(30%) brightness(30%) blur(10px);
+  z-index: -2;
 }
 
 .NextPhoto {

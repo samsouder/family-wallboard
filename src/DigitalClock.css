@@ -1,23 +1,55 @@
-.DigitalClock {}
+.DigitalClock {
+  position: absolute;
+  /*border: 2px solid blue;*/
+  top: 0;
+  left: 0;
+  bottom: 0;
+  min-width: 20vw;
+  max-width: 30vw;
+  background-image: linear-gradient(90deg, black, transparent);
+  font-family: "Roboto", "HelveticaNeue-Medium";
+  color: #ccc;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 0 0.75ex rgba(0,0,0,.75);
+}
 
-.DigitalClock .time {}
-
+.DigitalClock .time {
+  margin: 1vh 0 2vh 2vw;
+  font-family: "Roboto", "HelveticaNeue-Light";
+  letter-spacing: -0.1ex;
+  font-size: 5em;
+  font-weight: 300;
+}
 .DigitalClock .hours {}
-
 .DigitalClock .hours::after {
   content: ':';
 }
-
 .DigitalClock .minutes {}
+.DigitalClock .time .container {}
+.DigitalClock .seconds {
+  position: relative;
+  top: -0.8em;
+  left: 0.25em;
+  letter-spacing: normal;
+  font-size: 0.45em;
+}
+.DigitalClock .ampm {
+  position: relative;
+  top: 0;
+  left: -0.9em;
+  letter-spacing: normal;
+  font-size: 0.45em;
+}
 
-.DigitalClock .seconds {}
-
-.DigitalClock .ampm {}
-
-.DigitalClock .date {}
-
-.DigitalClock .dayOfWeek {}
-
-.DigitalClock .month {}
-
+.DigitalClock .date {
+  margin: 1vh 0 2vh 2vw;
+  font-family: "Roboto", "HelveticaNeue-Light";
+  font-size: 1.4em;
+}
+.DigitalClock .dayOfWeek {
+  padding: 0 1ex 0 0;
+}
+.DigitalClock .month {
+  padding: 0 0.75ex 0 0;
+}
 .DigitalClock .dayOfMonth {}

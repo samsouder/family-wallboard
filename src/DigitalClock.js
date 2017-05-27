@@ -27,8 +27,10 @@ class DigitalClock extends Component {
         <div className="time">
           <span className="hours">{Moment(date).format('h')}</span>
           <span className="minutes">{Moment(date).format('mm')}</span>
-          <span className="seconds">{Moment(date).format('s')}</span>
-          <span className="ampm">{Moment(date).format('a')}</span>
+          <span className="container">
+            <span className="seconds">{Moment(date).format('ss')}</span>
+            <span className="ampm">{Moment(date).format('a')}</span>
+          </span>
         </div>
         <div className="date">
           <span className="dayOfWeek">{Moment(date).format('dddd')}</span>
