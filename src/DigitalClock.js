@@ -35,7 +35,7 @@ class DigitalClock extends Component {
         <div className="date">
           <span className="dayOfWeek">{Moment(date).format('dddd')}</span>
           <span className="month">{Moment(date).format('MMM')}</span>
-          <span className="dayOfMonth">{Moment(date).format('Mo')}</span>
+          <span className="dayOfMonth">{Moment(date).format('Do')}</span>
         </div>
       </div>
     );
