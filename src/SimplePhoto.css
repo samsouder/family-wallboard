@@ -16,7 +16,8 @@
 }
 
 .PhotoBackground {
+  background-color: black;
   background-size: cover;
-  filter: blur(50px) grayscale(50%);
+  filter: saturate(40%) brightness(40%) blur(10px);
   z-index: 90;
 }
