@@ -1,3 +1,16 @@
+.PhotoLoader {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 10em;
+  height: 10em;
+  margin-right: -5em;
+  margin-top: -5em;
+}
+.PhotoLoader path {
+  fill: #444;
+}
+
 .Photo, .PhotoBackground {
   position: absolute;
   top: 0;
@@ -12,12 +25,15 @@
 
 .Photo {
   background-size: contain;
-  z-index: 100;
+  z-index: 1;
 }
 
 .PhotoBackground {
   background-color: black;
   background-size: cover;
-  filter: saturate(40%) brightness(40%) blur(10px);
-  z-index: 90;
+  filter: saturate(30%) brightness(30%) blur(10px);
+}
+
+.NextPhoto {
+  visibility: hidden;
 }

@@ -2,12 +2,14 @@
 import React, {Component} from 'react';
 import Dropbox from 'dropbox';
 import {includes, sample} from 'lodash'
+import Loader from './Loader';
 import './SimplePhoto.css';
 
 class SimplePhoto extends Component {
   state: {
     photos: string[],
-    url: string
+    currentPhotoUrl: string,
+    nextPhotoUrl: string
   };
   dbx: Dropbox;
   timerId: number;
@@ -17,7 +19,8 @@ class SimplePhoto extends Component {
     super(props);
     this.state = {
       photos: [],
-      url: ''
+      currentPhotoUrl: '',
+      nextPhotoUrl: ''
     };
     this.dbx = new Dropbox({accessToken: process.env.REACT_APP_DROPBOX_API_TOKEN});
     this.photoRefreshTime = 10;
@@ -59,7 +62,7 @@ class SimplePhoto extends Component {
 
   getPhotoUrl(path: string) {
     this.dbx.filesGetTemporaryLink({path: path}).then(({link}) => {
-      this.setState({...this.state, url: link});
+      this.queuePhotoUrl(link);
     }).catch((error) => {
       console.error(error);
     }).then(() => {
@@ -68,19 +71,42 @@ class SimplePhoto extends Component {
     });
   }
 
+  queuePhotoUrl(url: string) {
+    if (!this.state.currentPhotoUrl) {
+      this.setState({...this.state, currentPhotoUrl: url});
+      return;
+    }
+
+    if (!this.state.nextPhotoUrl) {
+      this.setState({...this.state, nextPhotoUrl: url});
+      return;
+    }
+
+    this.setState({...this.state, currentPhotoUrl: this.state.nextPhotoUrl, nextPhotoUrl: url});
+  }
+
   render() {
-    if (!this.state.url) {
-      return <div>{'Loading photos...'}</div>;
+    const urlsLoaded = this.state.currentPhotoUrl && this.state.nextPhotoUrl;
+
+    let loader = null;
+    if (!urlsLoaded) {
+      loader = <Loader className="PhotoLoader" />;
     }
 
     return (
       <div>
+        {loader}
         <div className="Photo" style={{
-          backgroundImage: 'url(' + this.state.url + ')'
-        }}/>
+          visibility: urlsLoaded ? 'visible' : 'hidden',
+          backgroundImage: 'url(' + this.state.currentPhotoUrl + ')'
+        }} />
         <div className="PhotoBackground" style={{
-          backgroundImage: 'url(' + this.state.url + ')'
-        }}/>
+          visibility: urlsLoaded ? 'visible' : 'hidden',
+          backgroundImage: 'url(' + this.state.currentPhotoUrl + ')'
+        }} />
+        <div className="NextPhoto" style={{
+          backgroundImage: 'url(' + this.state.nextPhotoUrl + ')'
+        }} />
       </div>
     );
   }
