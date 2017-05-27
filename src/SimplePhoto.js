@@ -27,7 +27,6 @@ class SimplePhoto extends Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount');
     const extensions = ['jpg', 'jpeg'];
     this.dbx.filesListFolder({path: '/Photos/Family Wallboard', recursive: true}).then((response) => {
       const imageFiles = response.entries.filter((e) => {
@@ -36,7 +35,6 @@ class SimplePhoto extends Component {
       }).map((e) => e.path_lower);
 
       // store the photo paths in state
-      console.log('finished getting photos');
       this.setState({...this.state, photos: imageFiles});
 
       // start the process of picking a photo and getting its url
