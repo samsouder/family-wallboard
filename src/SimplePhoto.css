@@ -32,7 +32,7 @@
 .PhotoBackground {
   background-color: black;
   background-size: cover;
-  filter: saturate(30%) brightness(30%) blur(10px);
+  filter: saturate(30%) brightness(90%) blur(10px);
   z-index: -2;
 }
 
