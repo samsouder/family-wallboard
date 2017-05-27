@@ -25,6 +25,7 @@
 
 .Photo {
   background-size: contain;
+  filter: drop-shadow(0 0 5em black);
   z-index: 1;
 }
 
