@@ -1,4 +1,5 @@
 // @flow
+/* eslint no-console: "off" */
 import React, {Component} from 'react';
 import Dropbox from 'dropbox';
 import {includes, sample} from 'lodash'
@@ -11,9 +12,16 @@ class SimplePhoto extends Component {
     currentPhotoUrl: string,
     nextPhotoUrl: string
   };
+
   dbx: Dropbox;
-  timerId: number;
+  currentCursor: string;
+  nextPhotoUrlTimer: number;
+  fetchPhotosTimer: number;
+
+  dbxPath: string;
+  photoReloadTime: number;
   photoRefreshTime: number;
+  photoExtensions: string[];
 
   constructor(props: {}) {
     super(props);
@@ -22,64 +30,98 @@ class SimplePhoto extends Component {
       currentPhotoUrl: '',
       nextPhotoUrl: ''
     };
+
     this.dbx = new Dropbox({accessToken: process.env.REACT_APP_DROPBOX_API_TOKEN});
-    this.photoRefreshTime = 10;
+    this.dbxPath = '/Photos/Family Wallboard';
+    this.photoReloadTime = 30; // minutes
+    this.photoRefreshTime = 20; // seconds
+    this.photoExtensions = ['jpg', 'jpeg'];
   }
 
   componentDidMount() {
-    const extensions = ['jpg', 'jpeg'];
-    this.dbx.filesListFolder({path: '/Photos/Family Wallboard', recursive: true}).then((response) => {
+    setInterval(this.updatePhotos.bind(this), this.photoRefreshTime * 60 * 1000);
+    this.fetchPhotos();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.nextPhotoUrlTimer);
+    clearInterval(this.fetchPhotosTimer);
+  }
+
+  fetchPhotos() {
+    console.log('Fetching photos...');
+    this.dbx.filesListFolder({path: this.dbxPath, recursive: true}).then((response) => {
+      console.log('New path cursor: ' + response.cursor);
+      this.currentCursor = response.cursor;
+
+      // Filter out files with appropriate extensions and just get the path for each
       const imageFiles = response.entries.filter((e) => {
         return e['.tag'] === 'file' &&
-          includes(extensions, e.name.substr(e.name.lastIndexOf('.') + 1));
+          includes(this.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
       }).map((e) => e.path_lower);
+      console.log('Found ' + imageFiles.length + ' images');
 
-      // store the photo paths in state
+      // Store the photo paths in state
       this.setState({...this.state, photos: imageFiles});
 
-      // start the process of picking a photo and getting its url
+      // Start the process of picking a photo and getting its url
       this.beamMeUpScotty();
     }).catch((error) => {
       console.error(error);
     });
   }
 
-  componentWillUnmount() {
-    clearTimeout(this.timerId);
+  updatePhotos () {
+    console.log('Checking Dropbox path for updates...');
+    this.dbx.filesListFolderGetLatestCursor({path: this.dbxPath, recursive: true}).then((response) => {
+      if (response.cursor !== this.currentCursor) {
+        console.log('Dropbox path was updated to new cursor: ' + response.cursor);
+        this.fetchPhotos();
+      }
+      console.log('Dropbox path has not been updated yet');
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   beamMeUpScotty() {
-    if (this.state.photos.length === 0) {
-      this.timerId = setTimeout(this.beamMeUpScotty.bind(this), this.photoRefreshTime * 1000);
-      return;
-    }
-    // get random photo
+    // Get a random photo and get then set it's url
     const path = sample(this.state.photos)
     this.getPhotoUrl(path);
   }
 
   getPhotoUrl(path: string) {
+    if (!path) {
+      console.error('Photo path is empty');
+      return;
+    }
+
+    // Get the temporary url for the passed photo path
+    console.log('Getting url to photo: ' + path);
     this.dbx.filesGetTemporaryLink({path: path}).then(({link}) => {
       this.queuePhotoUrl(link);
     }).catch((error) => {
       console.error(error);
     }).then(() => {
-      this.timerId = setTimeout(this.beamMeUpScotty.bind(this), this.photoRefreshTime * 1000);
-      console.log('done getting photo url -- waiting ' + this.photoRefreshTime + ' seconds to try new photo');
+      this.nextPhotoUrlTimer = setTimeout(this.beamMeUpScotty.bind(this), this.photoRefreshTime * 1000);
+      console.log('Waiting ' + this.photoRefreshTime + ' seconds to try next photo');
     });
   }
 
   queuePhotoUrl(url: string) {
     if (!this.state.currentPhotoUrl) {
+      console.log('Setting current photo to ' + url)
       this.setState({...this.state, currentPhotoUrl: url});
       return;
     }
 
     if (!this.state.nextPhotoUrl) {
+      console.log('Setting next photo to ' + url)
       this.setState({...this.state, nextPhotoUrl: url});
       return;
     }
 
+    console.log('Setting current photo to ' + this.state.nextPhotoUrl + ' and next photo to ' + url);
     this.setState({...this.state, currentPhotoUrl: this.state.nextPhotoUrl, nextPhotoUrl: url});
   }
 
