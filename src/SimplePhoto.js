@@ -77,8 +77,9 @@ class SimplePhoto extends Component {
       if (response.cursor !== this.currentCursor) {
         console.log('Dropbox path was updated to new cursor: ' + response.cursor);
         this.fetchPhotos();
+      } else {
+        console.log('Dropbox path has not been updated yet');
       }
-      console.log('Dropbox path has not been updated yet');
     }).catch((error) => {
       console.error(error);
     });
