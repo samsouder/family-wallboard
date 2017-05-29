@@ -8,8 +8,8 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <DigitalClock />
         <SimplePhoto />
+        <DigitalClock />
       </div>
     );
   }

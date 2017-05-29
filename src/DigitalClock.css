@@ -1,11 +1,9 @@
 .DigitalClock {
   position: absolute;
-  /*border: 2px solid blue;*/
   top: 0;
   left: 0;
   min-width: 20vw;
   max-width: 30vw;
-  /*background-image: linear-gradient(90deg, rgba(0,0,0,0.5), transparent);*/
   font-family: "Roboto", "HelveticaNeue-Medium";
   color: #ccc;
   -webkit-font-smoothing: antialiased;
