@@ -19,7 +19,7 @@ class SimplePhoto extends Component {
   fetchPhotosTimer: number;
 
   dbxPath: string;
-  photoReloadTime: number;
+  updatePhotosTime: number;
   photoRefreshTime: number;
   photoExtensions: string[];
 
@@ -28,19 +28,19 @@ class SimplePhoto extends Component {
     this.state = {
       photos: [],
       currentPhotoUrl: '',
-      nextPhotoUrl: ''
+      nextPhotoUrl: '',
     };
 
     this.dbx = new Dropbox({accessToken: process.env.REACT_APP_DROPBOX_API_TOKEN});
     this.dbxPath = '/Photos/Family Wallboard';
-    this.photoReloadTime = 30; // minutes
+    this.updatePhotosTime = 30; // minutes
     this.photoRefreshTime = 20; // seconds
     this.photoExtensions = ['jpg', 'jpeg'];
   }
 
   componentDidMount() {
-    setInterval(this.updatePhotos.bind(this), this.photoRefreshTime * 60 * 1000);
-    this.fetchPhotos();
+    setInterval(this.updatePhotos.bind(this), this.updatePhotosTime * 60 * 1000);
+    this.fetchPhotos(this.initializePhotos);
   }
 
   componentWillUnmount() {
@@ -48,7 +48,7 @@ class SimplePhoto extends Component {
     clearInterval(this.fetchPhotosTimer);
   }
 
-  fetchPhotos() {
+  fetchPhotos(callback?: () => void | void) {
     console.log('Fetching photos...');
     this.dbx.filesListFolder({path: this.dbxPath, recursive: true}).then((response) => {
       console.log('New path cursor: ' + response.cursor);
@@ -64,8 +64,9 @@ class SimplePhoto extends Component {
       // Store the photo paths in state
       this.setState({...this.state, photos: imageFiles});
 
-      // Start the process of picking a photo and getting its url
-      this.beamMeUpScotty();
+      if (callback) {
+        callback.bind(this)();
+      }
     }).catch((error) => {
       console.error(error);
     });
@@ -85,13 +86,17 @@ class SimplePhoto extends Component {
     });
   }
 
-  beamMeUpScotty() {
-    // Get a random photo and get then set it's url
-    const path = sample(this.state.photos)
-    this.getPhotoUrl(path);
+  initializePhotos() {
+    this.pickRandomPhoto(this.pickRandomPhoto());
   }
 
-  getPhotoUrl(path: string) {
+  pickRandomPhoto(callback?: () => void | void) {
+    // Get a random photo and get then set it's url
+    const path = sample(this.state.photos)
+    this.getPhotoUrl(path, callback);
+  }
+
+  getPhotoUrl(path: string, callback?: () => void | void) {
     if (!path) {
       console.error('Photo path is empty');
       return;
@@ -100,54 +105,56 @@ class SimplePhoto extends Component {
     // Get the temporary url for the passed photo path
     console.log('Getting url to photo: ' + path);
     this.dbx.filesGetTemporaryLink({path: path}).then(({link}) => {
-      this.queuePhotoUrl(link);
+      if (!this.state.currentPhotoUrl) {
+        console.log('Setting current photo to ' + link)
+        this.setState({...this.state, currentPhotoUrl: link});
+      } else if (!this.state.nextPhotoUrl) {
+        console.log('Setting next photo to ' + link)
+        this.setState({...this.state, nextPhotoUrl: link});
+      } else {
+        console.log('Setting current photo to ' + this.state.nextPhotoUrl + ' and next photo to ' + link);
+        this.setState({...this.state, currentPhotoUrl: this.state.nextPhotoUrl, nextPhotoUrl: link});
+      }
+
+      if (callback) {
+        callback.bind(this)();
+      }
     }).catch((error) => {
       console.error(error);
-    }).then(() => {
-      this.nextPhotoUrlTimer = setTimeout(this.beamMeUpScotty.bind(this), this.photoRefreshTime * 1000);
-      console.log('Waiting ' + this.photoRefreshTime + ' seconds to try next photo');
     });
   }
 
-  queuePhotoUrl(url: string) {
-    if (!this.state.currentPhotoUrl) {
-      console.log('Setting current photo to ' + url)
-      this.setState({...this.state, currentPhotoUrl: url});
-      return;
-    }
-
+  handleNextPhotoLoaded() {
+    // Is this the first page load or an image that really finished loading?
     if (!this.state.nextPhotoUrl) {
-      console.log('Setting next photo to ' + url)
-      this.setState({...this.state, nextPhotoUrl: url});
       return;
     }
 
-    console.log('Setting current photo to ' + this.state.nextPhotoUrl + ' and next photo to ' + url);
-    this.setState({...this.state, currentPhotoUrl: this.state.nextPhotoUrl, nextPhotoUrl: url});
+    console.log('Next image has loaded, waiting ' + this.photoRefreshTime + ' seconds to switch to it');
+    this.nextPhotoUrlTimer = setTimeout(this.pickRandomPhoto.bind(this), this.photoRefreshTime * 1000);
   }
 
   render() {
-    const urlsLoaded = this.state.currentPhotoUrl && this.state.nextPhotoUrl;
+    console.log('Rendering...');
+    const urlsReady = this.state.currentPhotoUrl && this.state.nextPhotoUrl;
 
     let loader = null;
-    if (!urlsLoaded) {
+    if (!urlsReady) {
       loader = <Loader className="PhotoLoader" />;
     }
 
     return (
-      <div>
+      <div className="PhotoContainer">
+        <img className="NextPhoto"
+          src={this.state.nextPhotoUrl}
+          onLoad={this.handleNextPhotoLoaded.bind(this)}
+          onError={this.handleNextPhotoLoaded.bind(this)}
+          alt="" />
+        <img className="PhotoBackground" src={this.state.currentPhotoUrl} style={{visibility: urlsReady ? 'visible' : 'hidden'}} alt="" />
+        <div className="Photo" style={{visibility: urlsReady ? 'visible' : 'hidden'}}>
+          <img src={this.state.currentPhotoUrl} alt="" />
+        </div>
         {loader}
-        <div className="Photo" style={{
-          visibility: urlsLoaded ? 'visible' : 'hidden',
-          backgroundImage: 'url(' + this.state.currentPhotoUrl + ')'
-        }} />
-        <div className="PhotoBackground" style={{
-          visibility: urlsLoaded ? 'visible' : 'hidden',
-          backgroundImage: 'url(' + this.state.currentPhotoUrl + ')'
-        }} />
-        <div className="NextPhoto" style={{
-          backgroundImage: 'url(' + this.state.nextPhotoUrl + ')'
-        }} />
       </div>
     );
   }
