@@ -1,0 +1,67 @@
+.DarkSkyWeather {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 18vw;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 0 0.75ex rgba(0,0,0,.75);
+  text-align: right;
+  padding: 1vh 2vw 0 2vw;
+  background-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.90));
+  overflow: hidden;
+}
+
+.DarkSkyWeather .currentTemperature {
+  font-weight: bolder;
+  font-size: 6em;
+}
+.DarkSkyWeather .currentTemperature .unit {
+  font-size: 0.5em;
+}
+.DarkSkyWeather .currentTemperature .wi {
+  vertical-align: -10%;
+}
+.DarkSkyWeather .hourlySummary {
+  margin: 1ex 0;
+  font-size: 1.5em;
+}
+.DarkSkyWeather .currentWind {
+  font-size: 2.5em;
+}
+.DarkSkyWeather .currentWind .speed {
+  padding-right: 0.5ex;
+}
+.DarkSkyWeather .currentWind .direction {
+  padding-right: 0.5ex;
+}
+.DarkSkyWeather .sunrise {
+  display: inline;
+  padding-right: 1ex;
+  font-size: 2.5em;
+}
+.DarkSkyWeather .sunset {
+  display: inline;
+  font-size: 2.5em;
+}
+.DarkSkyWeather .forecasts {
+  margin: 1em 0 0 0;
+  font-size: 2.5em;
+}
+.DarkSkyWeather .forecasts .forecast {
+  margin: 1ex 0 0 0;
+}
+.DarkSkyWeather .forecasts .summary {
+  font-size: 0.5em;
+}
+.DarkSkyWeather .forecasts .forecast .day {
+  padding-right: 1ex;
+  font-size: 0.75em;
+  color: #999;
+}
+.DarkSkyWeather .forecasts .forecast .high {
+  padding-right: 0.5ex;
+}
+.DarkSkyWeather .forecasts .forecast .low {
+  padding-right: 0.5ex;
+}
