@@ -18,12 +18,14 @@ class SimplePhoto extends Component {
   nextPhotoUrlTimer: number;
   fetchPhotosTimer: number;
 
-  dbxPath: string;
-  updatePhotosTime: number;
-  photoRefreshTime: number;
-  photoExtensions: string[];
+  static defaultProps = {
+    path: "/Photos",
+    photoUpdateTime: 30, // minutes
+    photoRefreshTime: 20, // seconds
+    photoExtensions: ['jpg', 'jpeg']
+  }
 
-  constructor(props: {}) {
+  constructor(props: {path: string, photoUpdateTime: number, photoRefreshTime: number, photoExtensions: string[]}) {
     super(props);
     this.state = {
       photos: [],
@@ -32,14 +34,10 @@ class SimplePhoto extends Component {
     };
 
     this.dbx = new Dropbox({accessToken: process.env.REACT_APP_DROPBOX_API_TOKEN});
-    this.dbxPath = '/Photos/Family Wallboard';
-    this.updatePhotosTime = 30; // minutes
-    this.photoRefreshTime = 20; // seconds
-    this.photoExtensions = ['jpg', 'jpeg'];
   }
 
   componentDidMount() {
-    setInterval(this.updatePhotos.bind(this), this.updatePhotosTime * 60 * 1000);
+    setInterval(this.updatePhotos.bind(this), this.props.photoUpdateTime * 60 * 1000);
     this.fetchPhotos(this.initializePhotos);
   }
 
@@ -50,14 +48,14 @@ class SimplePhoto extends Component {
 
   fetchPhotos(callback?: () => void | void) {
     console.log('Fetching photos...');
-    this.dbx.filesListFolder({path: this.dbxPath, recursive: true}).then((response) => {
+    this.dbx.filesListFolder({path: this.props.path, recursive: true}).then((response) => {
       console.log('New path cursor: ' + response.cursor);
       this.currentCursor = response.cursor;
 
       // Filter out files with appropriate extensions and just get the path for each
       const imageFiles = response.entries.filter((e) => {
         return e['.tag'] === 'file' &&
-          includes(this.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
+          includes(this.props.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
       }).map((e) => e.path_lower);
       console.log('Found ' + imageFiles.length + ' images');
 
@@ -74,7 +72,7 @@ class SimplePhoto extends Component {
 
   updatePhotos () {
     console.log('Checking Dropbox path for updates...');
-    this.dbx.filesListFolderGetLatestCursor({path: this.dbxPath, recursive: true}).then((response) => {
+    this.dbx.filesListFolderGetLatestCursor({path: this.props.path, recursive: true}).then((response) => {
       if (response.cursor !== this.currentCursor) {
         console.log('Dropbox path was updated to new cursor: ' + response.cursor);
         this.fetchPhotos();
@@ -130,8 +128,8 @@ class SimplePhoto extends Component {
       return;
     }
 
-    console.log('Next image has loaded, waiting ' + this.photoRefreshTime + ' seconds to switch to it');
-    this.nextPhotoUrlTimer = setTimeout(this.pickRandomPhoto.bind(this), this.photoRefreshTime * 1000);
+    console.log('Next image has loaded, waiting ' + this.props.photoRefreshTime + ' seconds to switch to it');
+    this.nextPhotoUrlTimer = setTimeout(this.pickRandomPhoto.bind(this), this.props.photoRefreshTime * 1000);
   }
 
   render() {

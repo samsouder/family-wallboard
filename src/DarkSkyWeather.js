@@ -8,24 +8,27 @@ class DarkSkyWeather extends Component {
   state: {
     apiData?: {}
   };
-  refreshTime: number;
   refreshTimer: number;
 
-  constructor(props: {}) {
+  static defaultProps = {
+    refreshTime: 3,
+    location: {latitude: 61.2163, longitude: -149.8949}
+  }
+
+  constructor(props: {refreshTime: number, location: {latitude: number, longitude: number}}) {
     super(props);
     this.state = {};
 
     DarkSkyApi.apiKey = process.env.REACT_APP_DARKSKY_API_TOKEN;
-    this.refreshTime = 3; // minutes (Note DarkSky has a 1000 requests per 24 hours limit)
   }
 
   componentDidMount() {
-    setInterval(this.refresh.bind(this), this.refreshTime * 60 * 1000);
+    setInterval(this.refresh.bind(this), this.props.refreshTime * 60 * 1000);
     this.refresh();
   }
 
   refresh() {
-    DarkSkyApi.loadItAll('minutely, flags', {latitude: 36.9801, longitude: -85.6122}).then(result => this.setState({apiData: result}));
+    DarkSkyApi.loadItAll('minutely, flags', this.props.location).then(result => this.setState({apiData: result}));
   }
 
   render() {
