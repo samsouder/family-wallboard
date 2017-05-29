@@ -23,29 +23,17 @@
 }
 .DigitalClock .minutes {}
 .DigitalClock .time .container { display: none; }
-.DigitalClock .seconds {
-  position: relative;
-  top: -0.8em;
-  left: 0.25em;
-  letter-spacing: normal;
-  font-size: 0.45em;
-}
-.DigitalClock .ampm {
-  position: relative;
-  top: 0;
-  left: -0.9em;
-  letter-spacing: normal;
-  font-size: 0.45em;
-}
+.DigitalClock .seconds {}
+.DigitalClock .ampm {}
 
 .DigitalClock .date {
-  margin: 0 0 2vh 2vw;
+  margin: -1vh 0 0 2vw;
   font-family: "Roboto", "HelveticaNeue-Light";
   font-size: 2em;
 }
 .DigitalClock .dayOfWeek {
   display: block;
-  padding: 0 0.5ex 0 0;
+  margin-bottom: -1vh;
   font-size: 2em;
 }
 .DigitalClock .month {
