@@ -51,6 +51,10 @@ class DarkSkyWeather extends Component {
       <div className="DarkSkyWeather">
         <div className="currentTemperature">{Math.round(this.state.apiData.currently.temperature)}° <i className={'wi wi-forecast-io-' + this.state.apiData.currently.icon} /></div>
         <div className="hourlySummary">{this.state.apiData.hourly.summary}</div>
+        <div className="currentPrecip">
+          <span className="probability">{this.state.apiData.currently.precipProbability * 100}%</span>
+          <span className="wi wi-raindrop" />
+        </div>
         <div className="currentWind">
           <span className="speed">{Math.round(this.state.apiData.currently.windSpeed)}</span>
           <span className="direction">{this.state.apiData.currently.windDirection}</span>

@@ -26,8 +26,24 @@
   margin: 1ex 0;
   font-size: 1.5em;
 }
-.DarkSkyWeather .currentWind {
+.DarkSkyWeather .currentPrecip {
+  display: inline;
+  padding-right: 0.5ex;
   font-size: 2.5em;
+}
+.DarkSkyWeather .currentPrecip .probability {
+  padding-right: 0.5ex;
+}
+.DarkSkyWeather .currentPrecip .wi {
+  font-size: 0.75em;
+}
+.DarkSkyWeather .currentWind {
+  display: inline;
+  font-size: 2.5em;
+}
+.DarkSkyWeather .currentWind::after {
+  display: block;
+  content: '';
 }
 .DarkSkyWeather .currentWind .speed {
   padding-right: 0.5ex;
@@ -35,14 +51,24 @@
 .DarkSkyWeather .currentWind .direction {
   padding-right: 0.5ex;
 }
+.DarkSkyWeather .currentWind .wi {
+  font-size: 0.75em;
+  vertical-align: 15%;
+}
 .DarkSkyWeather .sunrise {
   display: inline;
   padding-right: 1ex;
   font-size: 2.5em;
 }
+.DarkSkyWeather .sunrise .wi {
+  font-size: 0.75em;
+}
 .DarkSkyWeather .sunset {
   display: inline;
   font-size: 2.5em;
+}
+.DarkSkyWeather .sunset .wi {
+  font-size: 0.75em;
 }
 .DarkSkyWeather .forecasts {
   margin: 1em 0 0 0;
