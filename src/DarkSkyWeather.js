@@ -15,11 +15,11 @@ class DarkSkyWeather extends Component {
     location: {latitude: 61.2163, longitude: -149.8949}
   }
 
-  constructor(props: {refreshTime: number, location: {latitude: number, longitude: number}}) {
+  constructor(props: {apiToken: string, refreshTime: number, location: {latitude: number, longitude: number}}) {
     super(props);
     this.state = {};
 
-    DarkSkyApi.apiKey = process.env.REACT_APP_DARKSKY_API_TOKEN;
+    DarkSkyApi.apiKey = props.apiToken;
   }
 
   componentDidMount() {

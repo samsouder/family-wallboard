@@ -25,7 +25,7 @@ class SimplePhoto extends Component {
     photoExtensions: ['jpg', 'jpeg']
   }
 
-  constructor(props: {path: string, photoUpdateTime: number, photoRefreshTime: number, photoExtensions: string[]}) {
+  constructor(props: {apiToken: string, path: string, photoUpdateTime: number, photoRefreshTime: number, photoExtensions: string[]}) {
     super(props);
     this.state = {
       photos: [],
@@ -33,7 +33,7 @@ class SimplePhoto extends Component {
       nextPhotoUrl: '',
     };
 
-    this.dbx = new Dropbox({accessToken: process.env.REACT_APP_DROPBOX_API_TOKEN});
+    this.dbx = new Dropbox({accessToken: props.apiToken});
   }
 
   componentDidMount() {

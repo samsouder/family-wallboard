@@ -6,8 +6,7 @@ _Note this project is not meant for anything other than local network distributi
 
 **It is not secure to deploy this app to remote servers out of your control.**
 
-- Add `.env.local` file with your personal Dropbox and DarkSky API tokens
-- Customize sub-component properties in the `App` component
+- Copy `.env` to `.env.local` and customize your options including your personal Dropbox and DarkSky API tokens
 - `> yarn build`
 - Transfer the `build` directory to some place for hosting on your local box
 - `> yarn start` to test locally if you wish to hack around first
