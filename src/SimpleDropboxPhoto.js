@@ -4,9 +4,9 @@ import React, {Component} from 'react';
 import Dropbox from 'dropbox';
 import {includes, sample} from 'lodash'
 import Loader from './Loader';
-import './SimplePhoto.css';
+import './SimpleDropboxPhoto.css';
 
-class SimplePhoto extends Component {
+class SimpleDropboxPhoto extends Component {
   state: {
     photos: string[],
     currentPhotoUrl: string,
@@ -158,4 +158,4 @@ class SimplePhoto extends Component {
   }
 }
 
-export default SimplePhoto;
+export default SimpleDropboxPhoto;

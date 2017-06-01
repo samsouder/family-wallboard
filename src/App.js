@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import SimplePhoto from './SimplePhoto';
+import SimpleDropboxPhoto from './SimpleDropboxPhoto';
 import DigitalClock from './DigitalClock';
 import DarkSkyWeather from './DarkSkyWeather';
 import './App.css';
@@ -13,7 +13,7 @@ class App extends Component {
         {/* PhotoUpdateTime is the time in minutes to check Dropbox for changes to your photos folder */}
         {/* PhotoRefreshTime is the time in seconds between attempts to switch to a new random photo */}
         {/* PhotoExtensions is a list of image extensions to check for when filtering the photos folder */}
-        <SimplePhoto apiToken={process.env.REACT_APP_DROPBOX_API_TOKEN}
+        <SimpleDropboxPhoto apiToken={process.env.REACT_APP_DROPBOX_API_TOKEN}
           path={process.env.REACT_APP_DROPBOX_PHOTO_PATH}
           photoUpdateTime={process.env.REACT_APP_DROPBOX_PHOTO_UPDATE_INTERVAL_IN_MINUTES}
           photoRefreshTime={process.env.REACT_APP_PHOTO_REFRESH_INTERVAL_IN_SECONDS}
