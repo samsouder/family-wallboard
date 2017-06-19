@@ -17,6 +17,7 @@ class SimpleDropboxPhoto extends Component {
   currentCursor: string;
   nextPhotoUrlTimer: number;
   fetchPhotosTimer: number;
+  tempImageFiles: string[];
 
   static defaultProps = {
     path: "/Photos",
@@ -38,7 +39,7 @@ class SimpleDropboxPhoto extends Component {
 
   componentDidMount() {
     setInterval(this.updatePhotos.bind(this), this.props.photoUpdateTime * 60 * 1000);
-    this.fetchPhotos(this.initializePhotos);
+    this.recursiveFetchPhotos(this.initializePhotos);
   }
 
   componentWillUnmount() {
@@ -46,28 +47,80 @@ class SimpleDropboxPhoto extends Component {
     clearInterval(this.fetchPhotosTimer);
   }
 
-  fetchPhotos(callback?: () => void | void) {
-    console.log('Fetching photos...');
-    this.dbx.filesListFolder({path: this.props.path, recursive: true}).then((response) => {
-      console.log('New path cursor: ' + response.cursor);
-      this.currentCursor = response.cursor;
+  filterImages(entries: []): string[] {
+    return entries.filter((e) => {
+      return e['.tag'] === 'file' &&
+        includes(this.props.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
+    }).map((e) => e.path_lower);
+  }
 
-      // Filter out files with appropriate extensions and just get the path for each
-      const imageFiles = response.entries.filter((e) => {
-        return e['.tag'] === 'file' &&
-          includes(this.props.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
-      }).map((e) => e.path_lower);
-      console.log('Found ' + imageFiles.length + ' images');
+  fetchPhotos(): Promise<any> {
+    console.log('Fetching photos...')
+    return new Promise((resolve, reject) => {
+      this.dbx.filesListFolder({path: this.props.path, recursive: true}).then((response) => {
+        console.log('New path cursor: ' + response.cursor);
+        this.currentCursor = response.cursor;
 
-      // Store the photo paths in state
-      this.setState({...this.state, photos: imageFiles});
+        // Filter out files with appropriate extensions and just get the path for each
+        const imageFiles = this.filterImages(response.entries);
 
-      if (callback) {
-        callback.bind(this)();
-      }
-    }).catch((error) => {
-      console.error(error);
+        // Merge into temporary array
+        this.tempImageFiles = [...this.tempImageFiles, ...imageFiles];
+
+        // Determine if there are more to load and keep appending
+        if (response.has_more) {
+          this.fetchMorePhotos().then((imageFiles) => {
+            resolve(imageFiles);
+          }).catch((error) => console.log(error));
+        } else {
+          resolve(this.tempImageFiles);
+        }
+      }).catch((error) => reject(error));
     });
+  }
+
+  fetchMorePhotos(): Promise<any> {
+    console.log('Fetching more photos...');
+    return new Promise((resolve, reject) => {
+      this.dbx.filesListFolderContinue({cursor: this.currentCursor}).then((response) => {
+        console.log('New path cursor: ' + response.cursor);
+        this.currentCursor = response.cursor;
+
+        // Filter out files with appropriate extensions and just get the path for each
+        const imageFiles = this.filterImages(response.entries);
+
+        // Merge into temporary array
+        this.tempImageFiles = [...this.tempImageFiles, ...imageFiles];
+
+        // Determine if there are more to load and keep appending
+        if (response.has_more) {
+          this.fetchMorePhotos().then((imageFiles) => {
+            resolve(imageFiles);
+          }).catch((error) => console.log(error));
+        } else {
+          resolve(this.tempImageFiles);
+        }
+      }).catch((error) => reject(error));
+    });
+  }
+
+  recursiveFetchPhotos(finalCallback?: () => void | void) {
+    console.log('Starting photo fetch...');
+
+    // Clear out temporary image cache
+    this.tempImageFiles = [];
+
+    this.fetchPhotos().then((imageFiles) => {
+        console.log('Found ' + imageFiles.length + ' images');
+
+        // Store the photo paths in state
+        this.setState({...this.state, photos: imageFiles});
+
+        if (finalCallback) {
+          finalCallback.bind(this)();
+        }
+      }
+    ).catch((error) => console.log(error));
   }
 
   updatePhotos () {
@@ -75,7 +128,7 @@ class SimpleDropboxPhoto extends Component {
     this.dbx.filesListFolderGetLatestCursor({path: this.props.path, recursive: true}).then((response) => {
       if (response.cursor !== this.currentCursor) {
         console.log('Dropbox path was updated to new cursor: ' + response.cursor);
-        this.fetchPhotos();
+        this.recursiveFetchPhotos();
       } else {
         console.log('Dropbox path has not been updated yet');
       }
