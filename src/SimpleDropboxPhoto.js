@@ -2,7 +2,7 @@
 /* eslint no-console: "off" */
 import React, {Component} from 'react';
 import Dropbox from 'dropbox';
-import {includes, sample} from 'lodash'
+import {includes, shuffle} from 'lodash'
 import Loader from './Loader';
 import './SimpleDropboxPhoto.css';
 
@@ -18,6 +18,7 @@ class SimpleDropboxPhoto extends Component {
   nextPhotoUrlTimer: number;
   fetchPhotosTimer: number;
   tempImageFiles: string[];
+  nextPhotoIndex: number;
 
   static defaultProps = {
     path: "/Photos",
@@ -110,11 +111,17 @@ class SimpleDropboxPhoto extends Component {
     // Clear out temporary image cache
     this.tempImageFiles = [];
 
-    this.fetchPhotos().then((imageFiles) => {
+    this.fetchPhotos().then((imageFiles: string[]) => {
         console.log('Found ' + imageFiles.length + ' images');
 
+        // Randomize the order of the photos
+        const shuffledImageFiles = shuffle(imageFiles)
+
         // Store the photo paths in state
-        this.setState({...this.state, photos: imageFiles});
+        this.setState({...this.state, photos: shuffledImageFiles});
+
+        // Reset which photo to load next
+        this.resetNextPhotoIndex();
 
         if (finalCallback) {
           finalCallback.bind(this)();
@@ -138,13 +145,28 @@ class SimpleDropboxPhoto extends Component {
   }
 
   initializePhotos() {
-    this.pickRandomPhoto(this.pickRandomPhoto());
+    this.nextPhotoIndex = 1;
+    this.getPhotoUrl(this.state.photos[0], () => { this.getPhotoUrl(this.state.photos[1])})
   }
 
-  pickRandomPhoto(callback?: () => void | void) {
-    // Get a random photo and get then set it's url
-    const path = sample(this.state.photos)
-    this.getPhotoUrl(path, callback);
+  resetNextPhotoIndex(): number {
+    console.log('Resetting nextPhotoIndex to 0');
+    return this.nextPhotoIndex = 0;
+  }
+
+  incrementNextPhotoIndex(): number {
+    this.nextPhotoIndex++;
+    if (this.nextPhotoIndex === this.state.photos.length) {
+      this.resetNextPhotoIndex();
+    }
+    console.log('Set nextPhotoIndex to', this.nextPhotoIndex);
+
+    return this.nextPhotoIndex;
+  }
+
+  pickNextPhoto() {
+    const path = this.state.photos[this.incrementNextPhotoIndex()];
+    this.getPhotoUrl(path);
   }
 
   getPhotoUrl(path: string, callback?: () => void | void) {
@@ -182,7 +204,7 @@ class SimpleDropboxPhoto extends Component {
     }
 
     console.log('Next image has loaded, waiting ' + this.props.photoRefreshTime + ' seconds to switch to it');
-    this.nextPhotoUrlTimer = setTimeout(this.pickRandomPhoto.bind(this), this.props.photoRefreshTime * 1000);
+    this.nextPhotoUrlTimer = setTimeout(this.pickNextPhoto.bind(this), this.props.photoRefreshTime * 1000);
   }
 
   render() {
