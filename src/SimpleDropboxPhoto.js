@@ -22,41 +22,50 @@ class SimpleDropboxPhoto extends Component {
 
   static defaultProps = {
     path: "/Photos",
-    photoUpdateTime: 30, // minutes
     photoRefreshTime: 20, // seconds
     photoExtensions: ['jpg', 'jpeg']
   }
 
-  constructor(props: {apiToken: string, path: string, photoUpdateTime: number, photoRefreshTime: number, photoExtensions: string[]}) {
+  constructor(props: {
+    apiToken: string,
+    path: string,
+    photoRefreshTime: number,
+    photoExtensions: string[]
+  }) {
     super(props);
     this.state = {
       photos: [],
       currentPhotoUrl: '',
-      nextPhotoUrl: '',
+      nextPhotoUrl: ''
     };
 
     this.dbx = new Dropbox({accessToken: props.apiToken});
   }
 
   componentDidMount() {
-    setInterval(this.updatePhotos.bind(this), this.props.photoUpdateTime * 60 * 1000);
-    this.recursiveFetchPhotos(this.initializePhotos);
+    // Go ahead and fire off the first update of photos from Dropbox manually
+    // then start setting the first photos to display with those results
+    this.recursiveFetchPhotos().then(() => {
+      this.initializePhotos();
+
+      // Start polling for changes to the photos folder
+      this.updatePhotos();
+    }).catch((error) => console.error(error));
   }
 
   componentWillUnmount() {
     clearTimeout(this.nextPhotoUrlTimer);
-    clearInterval(this.fetchPhotosTimer);
+    clearTimeout(this.fetchPhotosTimer);
   }
 
   filterImages(entries: []): string[] {
     return entries.filter((e) => {
-      return e['.tag'] === 'file' &&
-        includes(this.props.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
+      return e['.tag'] === 'file' && includes(this.props.photoExtensions, e.name.substr(e.name.lastIndexOf('.') + 1));
     }).map((e) => e.path_lower);
   }
 
   fetchPhotos(): Promise<any> {
-    console.log('Fetching photos...')
+    console.log('Fetching photos...');
     return new Promise((resolve, reject) => {
       this.dbx.filesListFolder({path: this.props.path, recursive: true}).then((response) => {
         console.log('New path cursor: ' + response.cursor);
@@ -72,7 +81,7 @@ class SimpleDropboxPhoto extends Component {
         if (response.has_more) {
           this.fetchMorePhotos().then((imageFiles) => {
             resolve(imageFiles);
-          }).catch((error) => console.log(error));
+          }).catch((error) => console.error(error));
         } else {
           resolve(this.tempImageFiles);
         }
@@ -97,7 +106,7 @@ class SimpleDropboxPhoto extends Component {
         if (response.has_more) {
           this.fetchMorePhotos().then((imageFiles) => {
             resolve(imageFiles);
-          }).catch((error) => console.log(error));
+          }).catch((error) => console.error(error));
         } else {
           resolve(this.tempImageFiles);
         }
@@ -105,48 +114,82 @@ class SimpleDropboxPhoto extends Component {
     });
   }
 
-  recursiveFetchPhotos(finalCallback?: () => void | void) {
+  recursiveFetchPhotos(): Promise<any> {
     console.log('Starting photo fetch...');
+    return new Promise((resolve, reject) => {
+      // Clear out temporary image cache
+      this.tempImageFiles = [];
 
-    // Clear out temporary image cache
-    this.tempImageFiles = [];
-
-    this.fetchPhotos().then((imageFiles: string[]) => {
+      this.fetchPhotos().then((imageFiles: string[]) => {
         console.log('Found ' + imageFiles.length + ' images');
 
         // Randomize the order of the photos
         const shuffledImageFiles = shuffle(imageFiles)
 
         // Store the photo paths in state
-        this.setState({...this.state, photos: shuffledImageFiles});
+        this.setState({
+          ...this.state,
+          photos: shuffledImageFiles
+        });
 
         // Reset which photo to load next
         this.resetNextPhotoIndex();
 
-        if (finalCallback) {
-          finalCallback.bind(this)();
-        }
-      }
-    ).catch((error) => console.log(error));
+        // Resolve any callback
+        resolve();
+      }).catch((error) => reject(error));
+    });
   }
 
-  updatePhotos () {
+  setupNextPoll(timeToNextPoll: number) {
+    console.log('Polling for new photos again in ' + timeToNextPoll/1000 + ' seconds');
+    this.fetchPhotosTimer = setTimeout(this.updatePhotos.bind(this), timeToNextPoll);
+  }
+
+  updatePhotos() {
     console.log('Checking Dropbox path for updates...');
-    this.dbx.filesListFolderGetLatestCursor({path: this.props.path, recursive: true}).then((response) => {
-      if (response.cursor !== this.currentCursor) {
-        console.log('Dropbox path was updated to new cursor: ' + response.cursor);
-        this.recursiveFetchPhotos();
+
+    // Manually call the Longpoll API as it is broken in the Javascript SDK:
+    // https://github.com/dropbox/dropbox-sdk-js/issues/85
+    const headers = new Headers();
+    headers.append('Content-Type', 'text/plain; charset=dropbox-cors-hack');
+    const body = JSON.stringify({cursor: this.currentCursor});
+    fetch('https://notify.dropboxapi.com/2/files/list_folder/longpoll', {
+      method: 'POST',
+      headers: headers,
+      mode: 'cors',
+      body: body
+    }).then((response: Response) => {
+      if (!response.ok) {
+        throw Error('Dropbox Longpoll API request failed');
+      }
+
+      return response.json();
+    }).then((response) => {
+      // Initiate another update poll in a second by default unless Dropbox asks otherwise
+      let timeToNextPoll = 1000;
+      if (response.backoff) {
+        timeToNextPoll = ((response.backoff: any): number) * 1000;
+        console.log('Dropbox asked us to backoff a bit');
+      }
+
+      if (response.changes) {
+        console.log('Dropbox path was updated');
+        this.recursiveFetchPhotos().then(() => {
+          this.setupNextPoll(timeToNextPoll);
+        }).catch((error) => console.error(error));
       } else {
         console.log('Dropbox path has not been updated yet');
+        this.setupNextPoll(timeToNextPoll);
       }
-    }).catch((error) => {
-      console.error(error);
-    });
+    }).catch((error) => console.error(error));
   }
 
   initializePhotos() {
     this.nextPhotoIndex = 1;
-    this.getPhotoUrl(this.state.photos[0], () => { this.getPhotoUrl(this.state.photos[1])})
+    this.getPhotoUrl(this.state.photos[0], () => {
+      this.getPhotoUrl(this.state.photos[1])
+    })
   }
 
   resetNextPhotoIndex(): number {
@@ -180,13 +223,23 @@ class SimpleDropboxPhoto extends Component {
     this.dbx.filesGetTemporaryLink({path: path}).then(({link}) => {
       if (!this.state.currentPhotoUrl) {
         console.log('Setting current photo to ' + link)
-        this.setState({...this.state, currentPhotoUrl: link});
+        this.setState({
+          ...this.state,
+          currentPhotoUrl: link
+        });
       } else if (!this.state.nextPhotoUrl) {
         console.log('Setting next photo to ' + link)
-        this.setState({...this.state, nextPhotoUrl: link});
+        this.setState({
+          ...this.state,
+          nextPhotoUrl: link
+        });
       } else {
         console.log('Setting current photo to ' + this.state.nextPhotoUrl + ' and next photo to ' + link);
-        this.setState({...this.state, currentPhotoUrl: this.state.nextPhotoUrl, nextPhotoUrl: link});
+        this.setState({
+          ...this.state,
+          currentPhotoUrl: this.state.nextPhotoUrl,
+          nextPhotoUrl: link
+        });
       }
 
       if (callback) {
@@ -222,8 +275,11 @@ class SimpleDropboxPhoto extends Component {
           src={this.state.nextPhotoUrl}
           onLoad={this.handleNextPhotoLoaded.bind(this)}
           onError={this.handleNextPhotoLoaded.bind(this)}
+          alt=""/>
+        <img className="PhotoBackground"
+          src={this.state.currentPhotoUrl}
+          style={{visibility: urlsReady ? 'visible' : 'hidden'}}
           alt="" />
-        <img className="PhotoBackground" src={this.state.currentPhotoUrl} style={{visibility: urlsReady ? 'visible' : 'hidden'}} alt="" />
         <div className="Photo" style={{visibility: urlsReady ? 'visible' : 'hidden'}}>
           <img src={this.state.currentPhotoUrl} alt="" />
         </div>
