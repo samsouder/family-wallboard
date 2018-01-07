@@ -3,7 +3,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 18vw;
+  width: 22vw;
   -webkit-font-smoothing: antialiased;
   text-shadow: 0 0 0.75ex rgba(0,0,0,.75);
   text-align: right;
@@ -90,4 +90,10 @@
 }
 .DarkSkyWeather .forecasts .forecast .low {
   padding-right: 0.5ex;
+}
+.DarkSkyWeather .forecasts .forecast .precip {
+  color: #999;
+  font-size: 0.75em;
+  padding-left: 0.5ex;
+  vertical-align: 15%;
 }

@@ -37,23 +37,31 @@ class DarkSkyWeather extends Component {
     }
 
     const forecasts = this.state.apiData.daily.data.map((data, i) => {
+      let precipSpan = '';
+      if (data.precipProbability > 0) {
+        precipSpan = <span className="precip">{Math.round(data.precipProbability * 100)}%</span>;
+      }
+      
       return (
         <div key={i} className="forecast">
           <span className="day">{(i === 0 ) ? 'Today' : data.dateTime.format('ddd')}</span>
           <span className="high">{Math.round(data.temperatureMax)}°</span>
           <span className="low">{Math.round(data.temperatureMin)}°</span>
           <span className={'wi wi-forecast-io-' + data.icon} />
+          {precipSpan}
         </div>
       );
     });
+    
+    const currentPrecipIcon = this.state.apiData.currently.apparentTemperature <= 32 ? 'wi-snowflake-cold' : 'wi-raindrop';
 
     return (
       <div className="DarkSkyWeather">
         <div className="currentTemperature">{Math.round(this.state.apiData.currently.temperature)}° <i className={'wi wi-forecast-io-' + this.state.apiData.currently.icon} /></div>
         <div className="hourlySummary">{this.state.apiData.hourly.summary}</div>
         <div className="currentPrecip">
-          <span className="probability">{this.state.apiData.currently.precipProbability * 100}%</span>
-          <span className="wi wi-raindrop" />
+          <span className="probability">{Math.round(this.state.apiData.hourly.data[0].precipProbability * 100)}%</span>
+          <span className={'wi ' + currentPrecipIcon} />
         </div>
         <div className="currentWind">
           <span className="speed">{Math.round(this.state.apiData.currently.windSpeed)}</span>
@@ -63,7 +71,6 @@ class DarkSkyWeather extends Component {
         <div className="sunrise">{this.state.apiData.daily.data[0].sunriseDateTime.format('h:mm')} <i className="wi wi-sunrise" /></div>
         <div className="sunset">{this.state.apiData.daily.data[0].sunsetDateTime.format('h:mm')} <i className="wi wi-sunset" /></div>
         <div className="forecasts">
-          <div className="summary">{this.state.apiData.daily.summary}</div>
           {forecasts}
         </div>
       </div>
