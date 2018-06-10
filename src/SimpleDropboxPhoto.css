@@ -18,6 +18,17 @@
   fill: #444;
 }
 
+.PhotoExif {
+  position: absolute;
+  bottom: 1vh;
+  left: 2vw;
+  width: 5vw;
+  font-size: 1.5em;
+  /* Hack to ensure this shows up above the application border gradients */
+  z-index: 1;
+  color: #666;
+}
+
 .Photo {
   position: absolute;
   top: 0;

@@ -4,8 +4,9 @@
   "license": "MIT",
   "dependencies": {
     "dark-sky-api": "^0.5.28",
+    "exif-js": "^2.3.0",
     "lodash": "^4.17.4",
-    "moment": "^2.18.1",
+    "moment": "^2.22.2",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "weathericons": "^2.1.0"
@@ -19,7 +20,7 @@
     "eslint-plugin-flowtype": "^2.33.0",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-react": "^7.0.1",
-    "flow-bin": "^0.47.0",
+    "flow-bin": "^0.74.0",
     "react-scripts": "1.0.6"
   },
   "scripts": {
