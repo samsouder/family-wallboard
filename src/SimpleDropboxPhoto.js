@@ -287,15 +287,23 @@ class SimpleDropboxPhoto extends Component {
   }
 
   updateExifDataDisplay(imageElement: HTMLImageElement) {
+    let exifElement = document.getElementsByClassName("PhotoExif")[0];
+    exifElement.hidden = true;
+
     console.log("Finding original date time of image", imageElement);
+
     // Bust the exif-js cache as the image element is being re-used
     imageElement.exifdata = null;
+
     exif.getData(imageElement, function() {
       let originalDateTime = exif.getTag(this, "DateTimeOriginal");
-      console.log(originalDateTime);
+      console.log("Original date time of image", originalDateTime);
 
-      let exifElement = document.getElementsByClassName("PhotoExif")[0];
-      exifElement.innerHTML = moment(originalDateTime, "YYYY:MM:DD HH:mm:ss").format("MMM 'YY");
+      let date = moment(originalDateTime, "YYYY:MM:DD HH:mm:ss");
+      if (date.isValid()) {
+        exifElement.innerHTML = date.format("MMM 'YY");
+        exifElement.hidden = false;
+      }
     });
   }
 
