@@ -34,7 +34,7 @@ class PhotoExif extends PureComponent {
   }
 
   render() {
-    console.log("[PhotoExif]", "Rendering EXIF data...");
+    console.log("[PhotoExif]", "Rendering...");
 
     if (!this.state.date) {
       return null;

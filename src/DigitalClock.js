@@ -23,6 +23,8 @@ class DigitalClock extends PureComponent {
   }
 
   render() {
+    console.log("[DigitalClock] Rendering...");
+
     return (
       <div className="DigitalClock">
         <div className="time">

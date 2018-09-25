@@ -76,12 +76,6 @@ class SimpleRandomPhoto extends PureComponent {
     this.nextPhotoUrlTimer = setTimeout(this.handleNextPhotoSwitch.bind(this), this.props.photoRefreshTime * 1000);
   }
 
-  handleCurrentPhotoLoaded() {
-    console.log("[SimpleRandomPhoto] Current image has loaded");
-    // Force re-render to get build up the EXIF data area
-    this.forceUpdate();
-  }
-
   render() {
     console.log("[SimpleRandomPhoto] Rendering...");
 

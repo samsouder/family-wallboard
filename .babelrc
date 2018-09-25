@@ -1,4 +1,9 @@
 {
+  "env": {
+    "production" : {
+      "plugins": ["transform-remove-console"]
+    }
+  },
   "presets": ["react", "stage-2"],
   "plugins": ["transform-object-rest-spread"]
 }

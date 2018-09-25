@@ -1,5 +1,5 @@
 // @flow
-import React, { PureComponent } from "react";
+import React from "react";
 import SimpleRandomPhoto from "./SimpleRandomPhoto";
 import DigitalClock from "./DigitalClock";
 import DarkSkyWeather from "./DarkSkyWeather";
