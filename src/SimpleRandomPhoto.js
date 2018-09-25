@@ -1,13 +1,16 @@
 // @flow
 /* eslint no-console: "off" */
 import React, { Component } from "react";
+import axios from "axios";
 import exif from "exif-js";
 import moment from "moment";
+import Loader from "./Loader";
 import "./SimpleRandomPhoto.css";
 
 class SimpleRandomPhoto extends Component {
   state: {
-    nextPhotoIndex: number
+    currentPhoto: string,
+    nextPhoto: string
   };
   nextPhotoUrlTimer: number;
 
@@ -19,23 +22,43 @@ class SimpleRandomPhoto extends Component {
   constructor(props: { photoUrl: string, photoRefreshTime: number }) {
     super(props);
     this.state = {
-      nextPhotoIndex: 0
+      currentPhoto: "",
+      nextPhoto: ""
     };
+  }
+
+  componentDidMount() {
+    // Load first two image URLs
+    let firstImage = "";
+    let secondImage = "";
+    axios
+      .get(this.props.photoUrl)
+      .then(response => {
+        firstImage = this.props.photoUrl + response.data.file;
+      })
+      .then(() =>
+        axios.get(this.props.photoUrl).then(response => {
+          secondImage = this.props.photoUrl + response.data.file;
+
+          this.setState({ currentPhoto: firstImage, nextPhoto: secondImage });
+        })
+      );
   }
 
   componentWillUnmount() {
     clearTimeout(this.nextPhotoUrlTimer);
   }
 
-  incrementPhotoIndex() {
-    const newIndex = this.state.nextPhotoIndex + 1;
-    console.log("Incrementing nextPhotoIndex to:", newIndex);
-    this.setState({ nextPhotoIndex: newIndex });
-  }
-
-  handleMainPhotoExifUpdate(event) {
-    console.log("Main photo loaded", event.target);
-    this.updateExifDataDisplay(event.target);
+  handleNextPhotoSwitch() {
+    // Load new nextPhoto
+    // Set currentPhoto to nextPhoto
+    // Set new nextPhoto
+    axios.get(this.props.photoUrl).then(response =>
+      this.setState({
+        currentPhoto: this.state.nextPhoto,
+        nextPhoto: this.props.photoUrl + response.data.file
+      })
+    );
   }
 
   handleMainPhotoLoaded(event) {
@@ -56,7 +79,12 @@ class SimpleRandomPhoto extends Component {
       "Next image has loaded, waiting " + this.props.photoRefreshTime + " seconds to switch to it",
       event.target
     );
-    this.nextPhotoUrlTimer = setTimeout(this.incrementPhotoIndex.bind(this), this.props.photoRefreshTime * 1000);
+    this.nextPhotoUrlTimer = setTimeout(this.handleNextPhotoSwitch.bind(this), this.props.photoRefreshTime * 1000);
+  }
+
+  handleMainPhotoExifUpdate(event) {
+    console.log("Main photo loaded", event.target);
+    this.updateExifDataDisplay(event.target);
   }
 
   updateExifDataDisplay(imageElement: HTMLImageElement) {
@@ -83,23 +111,24 @@ class SimpleRandomPhoto extends Component {
   render() {
     console.log("Rendering...");
 
+    const photosReady = this.state.currentPhoto && this.state.nextPhoto;
+
+    if (!photosReady) {
+      return <Loader className="PhotoLoader" />;
+    }
+
     return (
       <div className="PhotoContainer">
         <img
           className="NextPhoto"
-          src={this.props.photoUrl + this.state.nextPhotoIndex}
+          src={this.state.nextPhoto}
           onLoad={this.handleNextPhotoLoaded.bind(this)}
           onError={this.handleNextPhotoLoaded.bind(this)}
-          style={{ visibility: "hidden" }}
           alt=""
         />
         <div className="PhotoBackgroundContainer" />
-        <div className="Photo">
-          <img
-            src={this.props.photoUrl + (this.state.nextPhotoIndex - 1)}
-            onLoad={this.handleMainPhotoLoaded.bind(this)}
-            alt=""
-          />
+        <div className="Photo" style={{ visibility: "visible" }}>
+          <img src={this.state.currentPhoto} onLoad={this.handleMainPhotoLoaded.bind(this)} alt="" />
         </div>
         <div className="PhotoExif" />
       </div>

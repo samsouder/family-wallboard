@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.18.0",
     "dark-sky-api": "^0.5.28",
     "exif-js": "^2.3.0",
     "lodash": "^4.17.4",
