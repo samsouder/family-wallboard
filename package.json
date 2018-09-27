@@ -4,32 +4,29 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
-    "dark-sky-api": "^0.5.28",
+    "dark-sky-api": "^0.6.31",
+    "dropbox": "^2.5.3",
     "exif-js": "^2.3.0",
     "lodash": "^4.17.4",
     "moment": "^2.22.2",
-    "react": "16.5",
-    "react-dom": "16.5",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-scripts-ts": "2.17.0",
     "weathericons": "^2.1.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-plugin-transform-remove-console": "^6.9.4",
-    "babel-preset-stage-2": "^6.24.1",
-    "dropbox": "^2.5.3",
-    "eslint": "^3.19.0",
-    "eslint-plugin-flowtype": "^2.33.0",
-    "eslint-plugin-import": "^2.3.0",
-    "eslint-plugin-react": "^7.0.1",
-    "flow-bin": "^0.74.0",
-    "react-scripts": "1.0.6"
+    "@types/jest": "^23.3.2",
+    "@types/node": "^10.11.0",
+    "@types/react": "^16.4.14",
+    "@types/react-dom": "^16.0.7",
+    "prettier": "^1.14.3",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "flow": "flow"
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
   }
 }

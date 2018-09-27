@@ -1,28 +1,27 @@
-// @flow
-import React, { PureComponent } from "react";
-import Moment from "moment";
+import * as Moment from "moment";
+import * as React from "react";
 import "./DigitalClock.css";
 
-class DigitalClock extends PureComponent {
-  timerId: number;
-  state: { date: string } = { date: new Moment() };
+class DigitalClock extends React.PureComponent<{}, { date: Moment.Moment }> {
+  public state = { date: Moment() };
+  private timerId: number;
 
-  componentDidMount() {
-    this.timerId = setInterval(() => this.tick(), 10000);
+  public componentDidMount() {
+    this.timerId = window.setInterval(() => this.tick(), 10000);
   }
 
-  componentWillUnmount() {
-    clearInterval(this.timerId);
+  public componentWillUnmount() {
+    window.clearInterval(this.timerId);
   }
 
-  tick() {
+  public tick() {
     const newTime = Moment();
     if (newTime.minutes() !== this.state.date.minutes()) {
       this.setState({ date: newTime });
     }
   }
 
-  render() {
+  public render() {
     console.log("[DigitalClock] Rendering...");
 
     return (
