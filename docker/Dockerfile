@@ -1,5 +1,7 @@
 FROM node:alpine as yarn-build
 
+WORKDIR /app
+
 COPY package.json .
 COPY yarn.lock .
 
@@ -19,4 +21,4 @@ WORKDIR /opt/app
 
 COPY docker/vhost.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=yarn-build build/ public/
+COPY --from=yarn-build /app/build/ public/
