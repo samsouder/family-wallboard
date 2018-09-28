@@ -7,7 +7,7 @@ import RandomPhoto from "./RandomPhoto";
 const photoRefreshInterval = Number(
   process.env.REACT_APP_PHOTO_REFRESH_INTERVAL_IN_SECONDS
 );
-const photoUrl = process.env.REACT_APP_PHOTO_URL;
+const photoUrl = process.env.REACT_APP_PHOTO_URL || "";
 const apiToken = process.env.REACT_APP_DARKSKY_API_TOKEN || "";
 const weatherRefreshInterval = Number(
   process.env.REACT_APP_WEATHER_REFRESH_INTERVAL_IN_MINUTES
