@@ -1,16 +1,12 @@
-import * as DarkSkyApi from "dark-sky-api";
+import axios from "axios";
 import * as Moment from "moment";
 import * as React from "react";
 import "../node_modules/weathericons/css/weather-icons.css";
 import "./DarkSkyWeather.css";
 
 interface IProps {
-  apiToken: string;
+  proxyUrl: string;
   refreshTime: number;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
 }
 
 interface IState {
@@ -21,6 +17,7 @@ interface IWeatherData {
   currently: {
     apparentTemperature: number;
     icon: string;
+    summary: string;
     temperature: number;
     windDirection: string;
     windSpeed: number;
@@ -28,18 +25,21 @@ interface IWeatherData {
   daily: {
     data: [
       {
-        dateTime: Moment.Moment;
+        time: number;
         precipProbability: number;
         icon: string;
-        sunriseDateTime: Moment.Moment;
-        sunsetDateTime: Moment.Moment;
+        sunriseTime: number;
+        sunsetTime: number;
         temperatureMax: number;
         temperatureMin: number;
       }
     ];
+    icon: string;
+    summary: string;
   };
   hourly: {
     data: [{ precipProbability: number }];
+    icon: string;
     summary: string;
   };
   precipProbability: number;
@@ -50,15 +50,12 @@ export default class DarkSkyWeather extends React.PureComponent<
   IState
 > {
   public static defaultProps = {
-    location: { latitude: 61.2163, longitude: -149.8949 },
-    refreshTime: 3
+    refreshTime: 5
   };
 
   private refreshTimer: number;
 
   public componentDidMount() {
-    DarkSkyApi.apiKey = this.props.apiToken;
-
     this.refreshTimer = window.setInterval(
       this.refresh.bind(this),
       this.props.refreshTime * 60 * 1000
@@ -72,9 +69,12 @@ export default class DarkSkyWeather extends React.PureComponent<
 
   public refresh() {
     console.log("[DarkSkyWeather] Loading new weather data...");
-    DarkSkyApi.loadItAll("minutely, flags", this.props.location).then(
-      (result: IWeatherData) => this.setState({ apiData: result })
-    );
+    axios
+      .get(this.props.proxyUrl)
+      .then(result => this.setState({ apiData: result.data }))
+      .catch(error =>
+        console.error("[DarkSkyWeather] Failed loading weather data", error)
+      );
   }
 
   public render() {
@@ -102,7 +102,7 @@ export default class DarkSkyWeather extends React.PureComponent<
       return (
         <div key={i} className="forecast">
           <span className="day">
-            {i === 0 ? "Today" : data.dateTime.format("ddd")}
+            {i === 0 ? "Today" : Moment.unix(data.time).format("ddd")}
           </span>
           <span className="high">{Math.round(data.temperatureMax)}°</span>
           <span className="low">{Math.round(data.temperatureMin)}°</span>
@@ -138,11 +138,11 @@ export default class DarkSkyWeather extends React.PureComponent<
           <span className="wi wi-strong-wind" />
         </div>
         <div className="sunrise">
-          {apiData.daily.data[0].sunriseDateTime.format("h:mm")}{" "}
+          {Moment.unix(apiData.daily.data[0].sunriseTime).format("h:mm")}{" "}
           <i className="wi wi-sunrise" />
         </div>
         <div className="sunset">
-          {apiData.daily.data[0].sunsetDateTime.format("h:mm")}{" "}
+          {Moment.unix(apiData.daily.data[0].sunsetTime).format("h:mm")}{" "}
           <i className="wi wi-sunset" />
         </div>
         <div className="forecasts">{forecasts}</div>

@@ -4,8 +4,6 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
-    "dark-sky-api": "^0.6.31",
-    "dropbox": "^2.5.3",
     "exif-js": "^2.3.0",
     "lodash": "^4.17.4",
     "moment": "^2.22.2",
