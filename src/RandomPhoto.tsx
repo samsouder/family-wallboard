@@ -14,7 +14,7 @@ interface IState {
   nextPhoto: string;
 }
 
-export default class SimpleRandomPhoto extends React.PureComponent<
+export default class RandomPhoto extends React.PureComponent<
   IProps,
   IState
 > {
@@ -77,21 +77,35 @@ export default class SimpleRandomPhoto extends React.PureComponent<
     // Load new nextPhoto
     // Set currentPhoto to nextPhoto
     // Set new nextPhoto
-    axios.get(this.props.photoUrl).then(response => {
-      console.log(
-        "[RandomPhoto] Fetched new image to load next",
-        response.data.file
-      );
-      this.setState({
-        currentPhoto: this.state.nextPhoto,
-        nextPhoto: this.props.photoUrl + response.data.file
+    axios
+      .get(this.props.photoUrl)
+      .then(response => {
+        console.log(
+          "[RandomPhoto] Fetched new image to load next",
+          response.data.file
+        );
+        this.setState({
+          currentPhoto: this.state.nextPhoto,
+          nextPhoto: this.props.photoUrl + response.data.file
+        });
+      })
+      .catch(error => {
+        console.error(
+          "[RandomPhoto] Failed to fetch new image to load next",
+          error
+        );
+
+        // Attempt another load in half the normal time
+        this.nextPhotoUrlTimer = window.setTimeout(
+          this.handleNextPhotoSwitch,
+          (this.props.photoRefreshTime / 2) * 1000
+        );
       });
-    });
   }
 
   public handleNextPhotoLoaded(event: React.SyntheticEvent<HTMLImageElement>) {
     console.log(
-      "[SimpleRandomPhoto] Next image has loaded, waiting " +
+      "[RandomPhoto] Next image has loaded, waiting " +
         this.props.photoRefreshTime +
         " seconds to switch to it",
       event.target
@@ -103,8 +117,8 @@ export default class SimpleRandomPhoto extends React.PureComponent<
   }
 
   public handleNextPhotoError(event: React.SyntheticEvent<HTMLImageElement>) {
-    console.log(
-      "[SimpleRandomPhoto] Next image was not loaded due to error",
+    console.error(
+      "[RandomPhoto] Next image was not loaded due to error",
       event
     );
     this.nextPhotoUrlTimer = window.setTimeout(
@@ -114,7 +128,7 @@ export default class SimpleRandomPhoto extends React.PureComponent<
   }
 
   public render() {
-    console.log("[SimpleRandomPhoto] Rendering...");
+    console.log("[RandomPhoto] Rendering...");
 
     const photosReady = this.state.currentPhoto && this.state.nextPhoto;
 
