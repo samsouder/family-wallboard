@@ -14,10 +14,7 @@ interface IState {
   nextPhoto: string;
 }
 
-export default class RandomPhoto extends React.PureComponent<
-  IProps,
-  IState
-> {
+export default class RandomPhoto extends React.PureComponent<IProps, IState> {
   public static defaultProps = {
     photoRefreshTime: 20, // seconds
     photoUrl: "http://localhost:5000/"
@@ -84,6 +81,22 @@ export default class RandomPhoto extends React.PureComponent<
           "[RandomPhoto] Fetched new image to load next",
           response.data.file
         );
+
+        // Force a refetch if the new photo url is already loaded
+        if (this.props.photoUrl + response.data.file === this.state.nextPhoto) {
+          throw Error(
+            "New image is already set to the nextPhoto position, skipping"
+          );
+        }
+        if (
+          this.props.photoUrl + response.data.file ===
+          this.state.currentPhoto
+        ) {
+          throw Error(
+            "New image is already set to the currentPhoto position, skipping"
+          );
+        }
+
         this.setState({
           currentPhoto: this.state.nextPhoto,
           nextPhoto: this.props.photoUrl + response.data.file
