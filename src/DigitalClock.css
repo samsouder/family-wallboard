@@ -11,7 +11,7 @@
 .DigitalClock .time {
   letter-spacing: -0.1ex;
   font-size: 9em;
-  font-weight: 300;
+  font-weight: 900;
   line-height: 15vh;
 }
 .DigitalClock .hours {}
@@ -25,7 +25,6 @@
 
 .DigitalClock .date {
   margin-top: -1vh;
-  font-weight: lighter;
   font-size: 2em;
 }
 .DigitalClock .dayOfWeek {
