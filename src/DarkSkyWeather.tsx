@@ -102,7 +102,9 @@ export default class DarkSkyWeather extends React.PureComponent<
           </td>
           <td className="high">{Math.round(data.temperatureMax)}°</td>
           <td className="low">{Math.round(data.temperatureMin)}°</td>
-          <td className="icon"><span className={"wi wi-forecast-io-" + data.icon} /></td>
+          <td className="icon">
+            <span className={"wi wi-forecast-io-" + data.icon} />
+          </td>
           <td className="precip">{precip}</td>
         </tr>
       );
@@ -117,12 +119,47 @@ export default class DarkSkyWeather extends React.PureComponent<
       <div className="DarkSkyWeather">
         <table>
           <tbody>
-            <tr>
-              <td className="currentTemperature">
-                {Math.round(apiData.currently.temperature)}°{" "}
+            <tr className="currentConditions">
+              <td colSpan={2}>
+                <span className="currentTemperature">
+                  {Math.round(apiData.currently.temperature)}°{" "}
+                  <i
+                    className={"wi wi-forecast-io-" + apiData.currently.icon}
+                  />
+                </span>
               </td>
-              <td className="currentIcon">
-                <i className={"wi wi-forecast-io-" + apiData.currently.icon} />
+            </tr>
+
+            <tr>
+              <td className="precipAndWind">
+                <div className="currentPrecip">
+                  <span className="probability">
+                    {Math.round(apiData.hourly.data[0].precipProbability * 100)}
+                    %
+                  </span>
+                  <span className={"wi " + currentPrecipIcon} />
+                </div>
+                <div className="currentWind">
+                  <span className="speed">
+                    {Math.round(apiData.currently.windSpeed)}
+                  </span>
+                  <span className="direction">
+                    {apiData.currently.windDirection}
+                  </span>
+                  <span className="wi wi-strong-wind" />
+                </div>
+              </td>
+              <td className="sunsetAndSunrise">
+                <div className="sunrise">
+                  {Moment.unix(apiData.daily.data[0].sunriseTime).format(
+                    "h:mm"
+                  )}{" "}
+                  <i className="wi wi-sunrise" />
+                </div>
+                <div className="sunset">
+                  {Moment.unix(apiData.daily.data[0].sunsetTime).format("h:mm")}{" "}
+                  <i className="wi wi-sunset" />
+                </div>
               </td>
             </tr>
 
@@ -132,45 +169,10 @@ export default class DarkSkyWeather extends React.PureComponent<
               </td>
             </tr>
 
-            <tr className="precipAndWind">
-              <td>
-                <div className="currentPrecip">
-                <span className="probability">
-                  {Math.round(apiData.hourly.data[0].precipProbability * 100)}%
-                </span>
-                <span className={"wi " + currentPrecipIcon} />
-                </div>
-              </td>
-              <td>
-                <div className="currentWind">
-                <span className="speed">
-                  {Math.round(apiData.currently.windSpeed)}
-                </span>
-                <span className="direction">
-                  {apiData.currently.windDirection}
-                </span>
-                <span className="wi wi-strong-wind" />
-                </div>
-              </td>
-            </tr>
-
-            <tr className="sunsetAndSunrise">
-              <td className="sunrise">
-                {Moment.unix(apiData.daily.data[0].sunriseTime).format("h:mm")}{" "}
-                <i className="wi wi-sunrise" />
-              </td>
-              <td className="sunset">
-                {Moment.unix(apiData.daily.data[0].sunsetTime).format("h:mm")}{" "}
-                <i className="wi wi-sunset" />
-              </td>
-            </tr>
-
             <tr>
               <td className="forecasts" colSpan={2}>
                 <table>
-                  <tbody>
-                    {forecasts}
-                  </tbody>
+                  <tbody>{forecasts}</tbody>
                 </table>
               </td>
             </tr>

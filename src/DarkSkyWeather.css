@@ -23,33 +23,30 @@
   margin: 0;
   padding: 0;
 }
+.DarkSkyWeather .currentConditions td {
+  height: 1.25em;
+}
 .DarkSkyWeather .currentTemperature {
   font-weight: bolder;
   font-size: 7em;
   text-align: right;
   padding-right: 0.5ex;
 }
-.DarkSkyWeather .currentIcon {
-  text-align: left;
-}
-.DarkSkyWeather .currentIcon .wi {
-  font-size: 6em;
-}
-.DarkSkyWeather .hourlySummary {
-  font-size: 2em;
-  text-align: right;
-  vertical-align: top;
+.DarkSkyWeather .currentTemperature .wi {
+  font-size: 0.8em;
 }
 .DarkSkyWeather .precipAndWind,
 .DarkSkyWeather .sunsetAndSunrise {
   height: 1.25em;
 }
-.DarkSkyWeather .precipAndWind td,
-.DarkSkyWeather .sunsetAndSunrise td {
-  vertical-align: top;
+.DarkSkyWeather .precipAndWind {
+  width: 60%;
+}
+.DarkSkyWeather .sunsetAndSunrise {
+  /* vertical-align: top; */
+  width: 40%;
 }
 .DarkSkyWeather .currentPrecip {
-  display: inline;
   padding-right: 0.5ex;
   font-size: 2.5em;
 }
@@ -88,9 +85,15 @@
 .DarkSkyWeather .sunset .wi {
   font-size: 0.75em;
 }
+.DarkSkyWeather .hourlySummary {
+  font-size: 2em;
+  text-align: right;
+  vertical-align: top;
+  padding-top: 1ex;
+}
 .DarkSkyWeather .forecasts {
-  font-size: 2.75em;
-  height: 65vh;
+  font-size: 2.5em;
+  height: 60vh;
 }
 .DarkSkyWeather .forecasts .forecast td {
   margin: 0.5ex 0;
@@ -105,10 +108,11 @@
   width: 30%;
 }
 .DarkSkyWeather .forecasts .forecast .high {
-  width: 16%;
+  width: 17%;
+  padding-right: 0.5ex;
 }
 .DarkSkyWeather .forecasts .forecast .low {
-  width: 16%;
+  width: 17%;
 }
 .DarkSkyWeather .forecasts .forecast .icon {
   text-align: center;
@@ -117,5 +121,5 @@
 .DarkSkyWeather .forecasts .forecast .precip {
   color: #999;
   font-size: 0.75em;
-  width: 16%;
+  width: 14%;
 }
