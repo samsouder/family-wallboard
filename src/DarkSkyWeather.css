@@ -34,6 +34,7 @@
 }
 .DarkSkyWeather .currentTemperature .wi {
   font-size: 0.8em;
+  vertical-align: 5%;
 }
 .DarkSkyWeather .precipAndWind,
 .DarkSkyWeather .sunsetAndSunrise {
@@ -43,7 +44,6 @@
   width: 60%;
 }
 .DarkSkyWeather .sunsetAndSunrise {
-  /* vertical-align: top; */
   width: 40%;
 }
 .DarkSkyWeather .currentPrecip {
