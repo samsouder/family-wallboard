@@ -36,8 +36,8 @@
   font-size: 6em;
 }
 .DarkSkyWeather .hourlySummary {
-  font-size: 1.5em;
-  text-align: left;
+  font-size: 2em;
+  text-align: right;
   vertical-align: top;
 }
 .DarkSkyWeather .precipAndWind,
@@ -89,7 +89,7 @@
   font-size: 0.75em;
 }
 .DarkSkyWeather .forecasts {
-  font-size: 3em;
+  font-size: 2.75em;
   height: 65vh;
 }
 .DarkSkyWeather .forecasts .forecast td {
